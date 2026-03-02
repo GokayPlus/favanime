@@ -675,7 +675,8 @@ export default definePlugin({
                 // Reduce tab bar gap so our custom tab stays visible
                 {
                     match: /className:\i\.\i(?=,type:"top")/,
-                    replace: '$& + " vc-favanime-modal-tab-bar"'
+                    replace: '$& + " vc-favanime-modal-tab-bar"',
+                    noWarn: true
                 }
             ]
         },

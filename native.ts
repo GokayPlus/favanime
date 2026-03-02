@@ -163,7 +163,14 @@ export async function fetchImage(
     // SSRF protection — only allow MAL CDN images
     if (typeof url !== "string" || !url.startsWith(ALLOWED_IMAGE_HOST)) return "";
     try {
-        const res = await fetch(url, { redirect: "follow" });
+        const res = await fetch(url, {
+            redirect: "follow",
+            headers: {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+                "Referer": "https://myanimelist.net/",
+                "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+            }
+        });
         if (!res.ok) return "";
         // Validate final URL after redirects to prevent redirect-based SSRF
         if (!res.url.startsWith(ALLOWED_IMAGE_HOST)) return "";
