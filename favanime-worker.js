@@ -53,7 +53,7 @@ function isValidEntry(a) {
     // Restrict image URLs to MAL CDN only — prevents SSRF via Native.fetchImage
     if (typeof a.image_url !== "string") return false;
     if (a.image_url.length > 512) return false;
-    if (!/^https:\/\/cdn\.myanimelist\.net\//.test(a.image_url)) return false;
+    if (!/^https:\/\/(cdn\.)?myanimelist\.net\/images\//.test(a.image_url)) return false;
     if (a.score != null && (typeof a.score !== "number" || isNaN(a.score) || a.score < 0 || a.score > 10)) return false;
     if (a.episodes != null && (!Number.isInteger(a.episodes) || a.episodes < 0 || a.episodes > 10_000)) return false;
     if (a.status != null && (typeof a.status !== "string" || a.status.length > 50)) return false;

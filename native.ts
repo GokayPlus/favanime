@@ -153,15 +153,19 @@ export async function fetchUserFavorites(
 
 // ==================== Image Proxy ====================
 
-const ALLOWED_IMAGE_HOST = "https://cdn.myanimelist.net/";
+const ALLOWED_IMAGE_HOSTS = ["https://cdn.myanimelist.net/", "https://myanimelist.net/images/"];
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 MB
+
+function isAllowedImageUrl(url: string): boolean {
+    return ALLOWED_IMAGE_HOSTS.some(host => url.startsWith(host));
+}
 
 export async function fetchImage(
     _: IpcMainInvokeEvent,
     url: string
 ): Promise<string> {
-    // SSRF protection — only allow MAL CDN images
-    if (typeof url !== "string" || !url.startsWith(ALLOWED_IMAGE_HOST)) return "";
+    // SSRF protection — only allow MAL image URLs
+    if (typeof url !== "string" || !isAllowedImageUrl(url)) return "";
     try {
         const res = await fetch(url, {
             redirect: "follow",
@@ -173,7 +177,7 @@ export async function fetchImage(
         });
         if (!res.ok) return "";
         // Validate final URL after redirects to prevent redirect-based SSRF
-        if (!res.url.startsWith(ALLOWED_IMAGE_HOST)) return "";
+        if (!isAllowedImageUrl(res.url)) return "";
         // Content-type must be an image
         const contentType = res.headers.get("content-type") || "";
         if (!contentType.startsWith("image/")) return "";
