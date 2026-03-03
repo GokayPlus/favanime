@@ -192,3 +192,5 @@ export async function fetchImage(
         return "";
     }
 }
+
+// im just saying token for id, not discord token
