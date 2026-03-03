@@ -124,27 +124,41 @@ async function addFavorite(anime: AnimeData) {
     if (cachedFavorites.some(f => f.mal_id === anime.mal_id)) return;
     cachedFavorites = [...cachedFavorites, anime];
     await DataStoreSet(STORE_KEY_FAV, cachedFavorites);
+    scheduleSyncToServer();
 }
 
 async function removeFavorite(malId: number) {
     cachedFavorites = cachedFavorites.filter(f => f.mal_id !== malId);
     await DataStoreSet(STORE_KEY_FAV, cachedFavorites);
+    scheduleSyncToServer();
 }
 
 async function addHated(anime: AnimeData) {
     if (cachedHated.some(f => f.mal_id === anime.mal_id)) return;
     cachedHated = [...cachedHated, anime];
     await DataStoreSet(STORE_KEY_HATE, cachedHated);
+    scheduleSyncToServer();
 }
 
 async function removeHated(malId: number) {
     cachedHated = cachedHated.filter(f => f.mal_id !== malId);
     await DataStoreSet(STORE_KEY_HATE, cachedHated);
+    scheduleSyncToServer();
 }
 
 // ==================== Server Sync ====================
 
 let syncToken: string | null = null;
+let syncDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+/** Schedule a sync after a short delay — resets if called again quickly (e.g. adding multiple anime) */
+function scheduleSyncToServer() {
+    if (syncDebounceTimer) clearTimeout(syncDebounceTimer);
+    syncDebounceTimer = setTimeout(() => {
+        syncDebounceTimer = null;
+        syncToServer().catch(() => { });
+    }, 2000);
+}
 
 async function loadSyncToken(): Promise<string> {
     if (syncToken) return syncToken;
@@ -455,6 +469,7 @@ function MALImportSection({ onImport }: { onImport: () => void; }) {
                     await DataStoreSet(STORE_KEY_FAV, cachedFavorites);
                 }
                 setMessage(`${newAnimes.length} anime imported (${animes.length - newAnimes.length} already in list).`);
+                scheduleSyncToServer();
                 onImport();
             }
         } catch {
