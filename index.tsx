@@ -600,8 +600,7 @@ function CloudSyncStatus() {
         <div className="vc-favanime-import-section">
             <Forms.FormTitle tag="h3">Sync to Server</Forms.FormTitle>
             <Forms.FormText style={{ marginBottom: 8 }}>
-                Sync your anime lists to anachter.dev so other users with FavAnime can see them on your profile.
-                Press sync after adding/removing anime.
+                If you have problems with automatic sync, you can sync your anime lists manually to anachter.dev so other users with FavAnime can see them on your profile.
             </Forms.FormText>
             <Button
                 onClick={handleSync}
